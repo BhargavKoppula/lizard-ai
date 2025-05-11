@@ -5,6 +5,7 @@ import streamlit as st
 import mediapipe as mp
 import matplotlib.pyplot as plt
 import matplotlib
+from PIL import Image
 matplotlib.use('Agg')
 
 # Streamlit Page Config
@@ -46,9 +47,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Add Logo from Local File
+logo_path = "Artboard_1-100-removebg-preview.png"  # Replace with your local image file name
+logo = Image.open(logo_path)
+st.image(logo, width=200)
+
 # UI Title
-st.markdown("<h1 class='title'>🦎 Lizard AI - Focus Predictor</h1>", unsafe_allow_html=True)
-st.markdown("<p class='subtitle'>Track your webcam focus with real-time metrics</p>", unsafe_allow_html=True)
+st.markdown("<h1 class='title'>Lizard - Focus Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle'>Set up your focus session to stay on track and boost productivity</p>", unsafe_allow_html=True)
 
 # Mediapipe Setup
 mp_face_mesh = mp.solutions.face_mesh
@@ -64,7 +70,7 @@ def eye_aspect_ratio(eye):
     return (A + B) / (2.0 * C)
 
 # Custom Time Setter
-st.markdown("### ⏱️ Set Focus Time (minutes)")
+st.markdown("### ⏱️ Set Focus Time")
 if 'session_minutes' not in st.session_state:
     st.session_state.session_minutes = 10
 col1, col2, col3 = st.columns([1, 2, 1])
