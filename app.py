@@ -79,8 +79,8 @@ with st.sidebar:
         st.markdown(f"<h3 style='text-align:center; color:#00ffcc;'>{st.session_state.session_minutes} Minutes</h3>", unsafe_allow_html=True)
 
     start_btn = st.button("✅ Start Session", key="start")
-    pause_btn = st.button("⏸️ Pause Session", key="pause")
-    resume_btn = st.button("▶️ Resume Session", key="resume")
+    # pause_btn = st.button("⏸️ Pause Session", key="pause")
+    # resume_btn = st.button("▶️ Resume Session", key="resume")
     stop_btn = st.button("🛑 Stop Session", key="stop")
 
     sidebar_timer = st.empty()
@@ -95,22 +95,22 @@ face_mesh = mp_face_mesh.FaceMesh(max_num_faces=1, min_detection_confidence=0.5,
 
 if 'running' not in st.session_state:
     st.session_state['running'] = False
-if 'paused' not in st.session_state:
-    st.session_state['paused'] = False
+# if 'paused' not in st.session_state:
+#     st.session_state['paused'] = False
 
 if start_btn:
     st.session_state['running'] = True
-    st.session_state['paused'] = False
+    # st.session_state['paused'] = False
     st.session_state['focus_start_time'] = time.time()
     st.session_state['focused_time'] = 0
     st.session_state['focus_times'] = []
     st.session_state['timestamps'] = []
     st.session_state['last_check_time'] = st.session_state['focus_start_time']
 
-elif pause_btn:
-    st.session_state['paused'] = True
-elif resume_btn:
-    st.session_state['paused'] = False
+# elif pause_btn:
+#     st.session_state['paused'] = True
+# elif resume_btn:
+#     st.session_state['paused'] = False
 elif stop_btn:
     st.session_state['running'] = False
 
@@ -121,9 +121,9 @@ if st.session_state['running']:
     metric_spot = st.empty()
 
     while time.time() - st.session_state['focus_start_time'] < st.session_state.session_minutes * 60:
-        if st.session_state['paused']:
-            time.sleep(1)
-            continue
+        # if st.session_state['paused']:
+        #     time.sleep(1)
+        #     continue
 
         ret, frame = cap.read()
         if not ret:
@@ -211,4 +211,3 @@ if st.session_state['running']:
     ax.grid(True, color='#333')
     st.pyplot(fig)
 
-    
