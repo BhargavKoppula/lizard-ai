@@ -48,12 +48,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Add Logo from Local File
-logo_path = "Artboard_1-100-removebg-preview.png"  # Replace with your local image file name
+logo_path = "logo_cut-removebg-preview.png"  # Replace with your local image file name
 logo = Image.open(logo_path)
-st.image(logo, width=200)
+st.image(logo, width=620)
 
 # UI Title
-st.markdown("<h1 class='title'>Lizard - Focus Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='title'>Focus Predictor</h1>", unsafe_allow_html=True)
 st.markdown("<p class='subtitle'>Set up your focus session to stay on track and boost productivity</p>", unsafe_allow_html=True)
 
 # Mediapipe Setup
