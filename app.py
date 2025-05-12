@@ -9,7 +9,7 @@ from PIL import Image
 matplotlib.use('Agg')
 
 # Streamlit Page Config
-st.set_page_config(page_title="Lizard AI - Focus Tracker", layout="centered")
+st.set_page_config(page_title="Lizard - Focus Tracker", layout="centered")
 st.markdown("""
     <style>
     body {
@@ -53,7 +53,7 @@ logo = Image.open(logo_path)
 st.image(logo, width=620)
 
 # UI Title
-st.markdown("<h1 class='title'>Focus Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='title'>Focus Tracker</h1>", unsafe_allow_html=True)
 st.markdown("<p class='subtitle'>Set up your focus session to stay on track and boost productivity</p>", unsafe_allow_html=True)
 
 # Mediapipe Setup
@@ -73,6 +73,20 @@ def eye_aspect_ratio(eye):
 st.markdown("### ⏱️ Set Focus Time")
 if 'session_minutes' not in st.session_state:
     st.session_state.session_minutes = 10
+
+# Quick Set Buttons
+st.markdown("#### 🔘 Quick Set Time")
+quick_col1, quick_col2, quick_col3 = st.columns(3)
+with quick_col1:
+    if st.button("2 Min"):
+        st.session_state.session_minutes = 2
+with quick_col2:
+    if st.button("5 Min"):
+        st.session_state.session_minutes = 5
+with quick_col3:
+    if st.button("15 Min"):
+        st.session_state.session_minutes = 15
+
 col1, col2, col3 = st.columns([1, 2, 1])
 with col1:
     if st.button("➖"):
@@ -172,8 +186,8 @@ if st.session_state.get("running", False):
     ax.plot(timestamps, focus_times, color='#00ffcc', linewidth=2)
     ax.set_facecolor('#1e1e1e')
     ax.set_title("Focus Over Time", fontsize=14, color='white')
-    ax.set_xlabel("Time (s)", color='white')
-    ax.set_ylabel("Focused Time (s)", color='white')
+    ax.set_xlabel("Session Time", color='white')
+    ax.set_ylabel("Focus", color='white')
     ax.tick_params(colors='white')
     ax.grid(True, color='#333')
     st.pyplot(fig)
