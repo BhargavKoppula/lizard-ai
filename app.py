@@ -4,9 +4,10 @@ import numpy as np
 import streamlit as st
 import mediapipe as mp
 import matplotlib.pyplot as plt
-import matplotlib
-from PIL import Image
 import random
+import matplotlib
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+from PIL import Image
 matplotlib.use('Agg')
 
 # Streamlit Page Config
@@ -79,8 +80,6 @@ with st.sidebar:
         st.markdown(f"<h3 style='text-align:center; color:#00ffcc;'>{st.session_state.session_minutes} Minutes</h3>", unsafe_allow_html=True)
 
     start_btn = st.button("✅ Start Session", key="start")
-    # pause_btn = st.button("⏸️ Pause Session", key="pause")
-    # resume_btn = st.button("▶️ Resume Session", key="resume")
     stop_btn = st.button("🛑 Stop Session", key="stop")
 
     sidebar_timer = st.empty()
@@ -95,42 +94,28 @@ face_mesh = mp_face_mesh.FaceMesh(max_num_faces=1, min_detection_confidence=0.5,
 
 if 'running' not in st.session_state:
     st.session_state['running'] = False
-# if 'paused' not in st.session_state:
-#     st.session_state['paused'] = False
 
 if start_btn:
     st.session_state['running'] = True
-    # st.session_state['paused'] = False
     st.session_state['focus_start_time'] = time.time()
     st.session_state['focused_time'] = 0
     st.session_state['focus_times'] = []
     st.session_state['timestamps'] = []
     st.session_state['last_check_time'] = st.session_state['focus_start_time']
 
-# elif pause_btn:
-#     st.session_state['paused'] = True
-# elif resume_btn:
-#     st.session_state['paused'] = False
 elif stop_btn:
     st.session_state['running'] = False
 
-if st.session_state['running']:
-    cap = cv2.VideoCapture(0)
-    frame_spot = st.empty()
-    time_spot = st.empty()
-    metric_spot = st.empty()
+# Video processing class for WebRTC
+class VideoTransformer(VideoTransformerBase):
+    def __init__(self):
+        self.face_mesh = mp.solutions.face_mesh.FaceMesh(max_num_faces=1, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+        self.mp_drawing = mp.solutions.drawing_utils
 
-    while time.time() - st.session_state['focus_start_time'] < st.session_state.session_minutes * 60:
-        # if st.session_state['paused']:
-        #     time.sleep(1)
-        #     continue
-
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = face_mesh.process(rgb)
+    def transform(self, frame):
+        # Convert the frame to RGB
+        image = frame.to_rgb()
+        results = self.face_mesh.process(image)
         status = "Not Focused"
         now = time.time()
 
@@ -149,27 +134,36 @@ if st.session_state['running']:
                     status = "Focused"
                     st.session_state['focused_time'] += now - st.session_state['last_check_time']
 
-                mp.solutions.drawing_utils.draw_landmarks(frame, landmarks, mp_face_mesh.FACEMESH_TESSELATION)
+                self.mp_drawing.draw_landmarks(frame, landmarks, mp_face_mesh.FACEMESH_TESSELATION)
 
         st.session_state['last_check_time'] = now
 
         label = f"{status}"
         color = (0, 255, 0) if status == "Focused" else (0, 0, 255)
+        frame = frame.to_ndarray(format="bgr24")
         cv2.putText(frame, label, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
 
         st.session_state['timestamps'].append(now - st.session_state['focus_start_time'])
         st.session_state['focus_times'].append(st.session_state['focused_time'])
 
-        frame_spot.image(frame, channels="BGR")
-        remaining = int(st.session_state.session_minutes * 60 - (now - st.session_state['focus_start_time']))
+        return frame
+
+if st.session_state['running']:
+    # Start the webcam stream using webrtc_streamer
+    webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
+
+    # Timer and Metrics
+    time_spot = st.empty()
+    metric_spot = st.empty()
+
+    while time.time() - st.session_state['focus_start_time'] < st.session_state.session_minutes * 60:
+        remaining = int(st.session_state.session_minutes * 60 - (time.time() - st.session_state['focus_start_time']))
         time_spot.markdown(f"### ⏳ Remaining Time: {remaining // 60}m {remaining % 60}s")
         sidebar_timer.markdown(f"#### ⏳ Time Left: {remaining // 60}m {remaining % 60}s")
 
         if stop_btn:
             st.session_state['running'] = False
             break
-
-    cap.release()
 
     st.markdown("<div class='metric'>✅ Session Completed!</div>", unsafe_allow_html=True)
     st.markdown(f"<div class='metric'>🧠 Total Focused Time: {int(st.session_state['focused_time'])} seconds</div>", unsafe_allow_html=True)
@@ -205,8 +199,8 @@ if st.session_state['running']:
     ax.plot(st.session_state['timestamps'], st.session_state['focus_times'], color='#00ffcc', linewidth=2)
     ax.set_facecolor('#1e1e1e')
     ax.set_title("Focus Over Time", fontsize=14, color='white')
-    ax.set_xlabel("Time (s)", color='white')
-    ax.set_ylabel("Focused Time (s)", color='white')
+    ax.set_xlabel("Time", color='white')
+    ax.set_ylabel("Focused Time", color='white')
     ax.tick_params(colors='white')
     ax.grid(True, color='#333')
     st.pyplot(fig)
