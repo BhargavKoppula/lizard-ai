@@ -1,6 +1,6 @@
 streamlit
-opencv-python-headless
+streamlit-webrtc
+opencv-python
+tensorflow
 mediapipe
-numpy
-matplotlib
 Pillow
