@@ -1,5 +1,5 @@
-streamlit
-opencv-python-headless
-numpy
-tensorflow
+streamlit==1.13.0
+streamlit-webrtc==0.41.0
+opencv-python
 mediapipe
+tensorflow
