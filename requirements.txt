@@ -1,4 +1,3 @@
-cv2
 tensorflow
 mediapipe==0.10.13
 streamlit
