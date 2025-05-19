@@ -1,5 +1,6 @@
-tensorflow
 mediapipe==0.10.13
 streamlit
-streamlit-webrtc
 opencv-python-headless
+matplotlib
+numpy
+random
