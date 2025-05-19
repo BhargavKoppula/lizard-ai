@@ -3,4 +3,3 @@ streamlit
 opencv-python-headless
 matplotlib
 numpy
-random
