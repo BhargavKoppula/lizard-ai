@@ -1,5 +1,8 @@
-mediapipe==0.10.13
 streamlit
-opencv-python-headless
-matplotlib
+streamlit-webrtc
+opencv-python
+mediapipe
+av
 numpy
+matplotlib
+Pillow
